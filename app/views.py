@@ -5,7 +5,6 @@ from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.utils import secure_filename
 from app.models import UserProfile
 from app.forms import LoginForm
-from app.forms import UploadForm
 from werkzeug.security import check_password_hash
 
 
@@ -108,8 +107,16 @@ def get_image(filename):
     return send_from_directory(os.path.join(os.getcwd(), app.config['UPLOAD_FOLDER']), filename)
 
 @app.route('/file')
+@login_required
 def files():
     return render_template(files.html, images = get_uploaded_images())
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash("You are logged out!!!")
+    return redirect(url_for('home'))
 
 @app.route('/<file_name>.txt')
 def send_text_file(file_name):
